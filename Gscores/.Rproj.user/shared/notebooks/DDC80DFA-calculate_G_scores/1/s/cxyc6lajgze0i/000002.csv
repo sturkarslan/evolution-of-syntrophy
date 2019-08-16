@@ -1,0 +1,7 @@
+"0","mut.effect <- melt(table(mut.data.dv$effect))"
+"0","p2 <- ggplot(mut.effect, aes(factor(Var1, levels = mut.effect[order(mut.effect$value, decreasing = T),""Var1""]), value, fill=Var1))"
+"0","p2 <- p2 + geom_bar(stat=""identity"")"
+"0","p2 <- p2 + geom_label(aes(label=value))  "
+"0","p2 <- p2 + theme(axis.text = element_blank())"
+"0","p2 <- p2 + labs(x = ""Effect"", y = ""Count"")"
+"0","p2"

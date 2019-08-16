@@ -1,0 +1,12 @@
+name: Syntrophy_Plots
+title: Syntrophy_Plots
+username:
+account: sturkarslan
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1047696
+bundleId: 2259220
+url: https://sturkarslan.shinyapps.io/Syntrophy_Plots/
+when: 1563919280.57008
+asMultiple: FALSE
+asStatic: FALSE

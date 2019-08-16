@@ -10,13 +10,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Load libraries
 ```{r}
-library('ggplot2');library('reshape2');library('shiny');library(gridExtra);
+library('ggplot2');library('reshape2');library('shiny');library('gridExtra');
 ```
 
 ### Load data
 ```{r}
+#setwd("/Users/sturkars/Documents/R Projects/Desulfovibrio/")
 # load growth data fro grofit results
-growth.file <- "/Volumes/GoogleDrive/My Drive/New_Syntrophy_Analysis/Growth/20190612grofitresults_modified.txt"
+growth.file <- "20190612grofitresults_modified.txt"
 growth.data <- read.delim(growth.file, header = T, sep="\t", stringsAsFactors = F)
 # melt growth data
 growth.melted <- melt(growth.data, measure.vars = c("rate", "yield"), id.vars = c("ID","pair","pairing_type","inter_vs_intra","D.colony","M.colony", "D.epd"))

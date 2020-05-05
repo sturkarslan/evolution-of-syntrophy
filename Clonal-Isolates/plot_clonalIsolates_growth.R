@@ -1,0 +1,174 @@
+---
+  title: "Dv-Mm Clonal Isolate Pairings"
+runtime: shiny
+output: html_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_knit$set(echo = TRUE, root.dir = '/Volumes/Macintosh HD/Users/serdarturkaslan/Documents/GitHub/evolution-of-syntrophy/Clonal-Isolates')
+```
+
+### Load libraries
+```{r}
+library('ggplot2');library('reshape2');library('shiny');library(gridExtra);
+setwd("/Volumes/Macintosh HD/Users/serdarturkaslan/Documents/GitHub/evolution-of-syntrophy/Clonal-Isolates")
+```
+
+### Load data
+```{r}
+# load growth data fro grofit results
+growth.file <- "t"
+growth.data <- read.delim(growth.file, header = T, sep="\t", stringsAsFactors = F)
+# melt growth data
+growth.melted <- melt(growth.data, measure.vars = c("rate", "yield"), id.vars = c("ID","pair","pairing_type","inter_vs_intra","D.colony","M.colony", "D.epd"))
+
+```
+
+### Growth rate and Yield Plots 
+```{r}
+# ggplot boxpot for rate
+growth.rate <- growth.melted[which(growth.melted$variable == "rate"),]
+growth.yield <- growth.melted[which(growth.melted$variable == "yield"),]
+
+```
+
+
+```{r growthRate, echo=FALSE}
+inputPanel(
+  
+  selectInput("checkGroup", label = "Color by:",
+              choices = c("EPD", "inter_vs_intra","pairing_type", "Colony"), selected = "inter_vs_intra"),
+  
+  selectInput("facetGroup", label = "Facet by:",
+              choices = c("EPD","inter_vs_intra","pairing_type", "Colony", "None"), selected = "Colony"),
+  
+  radioButtons("radioType", label = "Plot Type",
+               choices = list("Boxplot" = 1, "Violin" = 2, "Dotplot" = 3), 
+               selected = 1, inline = T, width = "400px"),
+  
+  checkboxInput("checkboxDotplots", label = "Show/Hide Points", value = TRUE,width = "400px")
+  
+)
+
+renderPlot({
+  # coloring
+  if(input$checkGroup == "EPD"){
+    rate.plot <- ggplot(growth.rate, aes(x=inter_vs_intra, y=value, fill=D.epd))
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=D.epd))
+  }
+  if(input$checkGroup == "inter_vs_intra"){
+    rate.plot <- ggplot(growth.rate, aes(x=inter_vs_intra, y=value, fill=inter_vs_intra))
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=inter_vs_intra))
+  }
+  if(input$checkGroup == "pairing_type"){
+    rate.plot <- ggplot(growth.rate, aes(x=inter_vs_intra, y=value, fill=pairing_type))
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=pairing_type))
+  }
+  if(input$checkGroup == "Colony"){
+    rate.plot <- ggplot(growth.rate, aes(x=inter_vs_intra, y=value, fill=D.colony))
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=D.colony))
+  }
+  
+  # faceting
+  if(input$facetGroup == "None"){
+    rate.plot <- ggplot(growth.rate, aes(x=inter_vs_intra, y=value, fill=inter_vs_intra))
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=inter_vs_intra))
+  }
+  if(input$facetGroup == "inter_vs_intra"){
+    rate.plot <- rate.plot + facet_grid(.~inter_vs_intra, scales = "free_x")
+    yield.plot <- yield.plot + facet_grid(.~inter_vs_intra, scales = "free_x")
+  }
+  if(input$facetGroup == "EPD"){
+    rate.plot <- rate.plot + facet_grid(.~D.epd, scales = "free_x")
+    yield.plot <- yield.plot + facet_grid(.~D.epd, scales = "free_x")
+  }
+  if(input$facetGroup == "pairing_type"){
+    rate.plot <- rate.plot + facet_grid(.~pairing_type, scales = "free_x")
+    yield.plot <- yield.plot + facet_grid(.~pairing_type, scales = "free_x")
+  }
+  if(input$facetGroup == "Colony"){
+    rate.plot <- rate.plot + facet_grid(.~D.colony, scales = "free_x",)
+    yield.plot <- yield.plot + facet_grid(.~D.colony, scales = "free_x",)
+  }
+  
+  # rate plot
+  if(input$radioType == "2"){
+    rate.plot <- rate.plot + geom_violin()
+  } else if(input$radioType == "3") {
+    rate.plot <- rate.plot + geom_point()
+  } else{
+    rate.plot <- rate.plot + geom_boxplot()
+  }
+  
+  if(input$checkboxDotplots == T){
+    rate.plot <- rate.plot + geom_point(aes(y=value, shape=D.colony, color=D.colony))
+  }  
+  
+  rate.plot <- rate.plot + labs(x="pairings", y="Growth rate", title = "Growth Rate Comparison", subtitle = "UE3 Clonal Isolate Pairings, EPDs and Ancestors")
+  rate.plot <- rate.plot + theme(axis.text.x = element_text(angle = 90, size = 13), strip.text.x = element_text(size = 14, colour = "red"))
+  # yield plot
+  yield.plot <- yield.plot + geom_boxplot()
+  yield.plot <- yield.plot + geom_point(aes(y=value, shape=D.colony, color=D.colony))
+  yield.plot <- yield.plot + labs(x="pairings", y="Growth Yield", title = "Growth Yield Comparison", subtitle = "UE3 Clonal Isolate Pairings, EPDs and Ancestors")
+  yield.plot <- yield.plot + theme(axis.text.x = element_text(angle = 90, size = 13), strip.text.x = element_text(size = 14, colour = "red"))
+  
+  #grid.arrange(arrangeGrob(rate.plot, yield.plot, ncol=1, nrow=2, heights=c(100,100)))
+  rate.plot
+})
+
+```
+
+```{r growthYield, echo=FALSE}
+renderPlot({
+  # coloring
+  if(input$checkGroup == "EPD"){
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=D.epd))
+  }
+  if(input$checkGroup == "inter_vs_intra"){
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=inter_vs_intra))
+  }
+  if(input$checkGroup == "pairing_type"){
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=pairing_type))
+  }
+  if(input$checkGroup == "Colony"){
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=D.colony))
+  }
+  
+  # faceting
+  if(input$facetGroup == "None"){
+    yield.plot <- ggplot(growth.yield, aes(x=inter_vs_intra, y=value, fill=inter_vs_intra))
+  }
+  if(input$facetGroup == "inter_vs_intra"){
+    yield.plot <- yield.plot + facet_grid(.~inter_vs_intra, scales = "free_x")
+  }
+  if(input$facetGroup == "EPD"){
+    yield.plot <- yield.plot + facet_grid(.~D.epd, scales = "free_x")
+  }
+  if(input$facetGroup == "pairing_type"){
+    yield.plot <- yield.plot + facet_grid(.~pairing_type, scales = "free_x")
+  }
+  if(input$facetGroup == "Colony"){
+    yield.plot <- yield.plot + facet_grid(.~D.colony, scales = "free_x",)
+  }
+  
+  if(input$radioType == "2"){
+    yield.plot <- yield.plot + geom_violin()
+  } else if(input$radioType == "3") {
+    yield.plot <- yield.plot + geom_point()
+  } else{
+    yield.plot <- yield.plot + geom_boxplot()
+  }  
+  
+  if(input$checkboxDotplots == T){
+    yield.plot <- yield.plot + geom_point(aes(y=value, shape=D.colony, color=D.colony))
+  }  
+  
+  # yield plot
+  yield.plot <- yield.plot + labs(x="pairings", y="Growth Yield", title = "Growth Yield Comparison", subtitle = "UE3 Clonal Isolate Pairings, EPDs and Ancestors")
+  yield.plot <- yield.plot + theme(axis.text.x = element_text(angle = 90, size = 13), strip.text.x = element_text(size = 14, colour = "red"))
+  
+  yield.plot
+})
+
+```
+

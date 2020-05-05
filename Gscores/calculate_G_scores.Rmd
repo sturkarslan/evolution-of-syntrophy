@@ -129,4 +129,3 @@ cat("Sum of Observed G-scores:", sum.gscores, "\n")
 # write results into a table
 write.table(all.table, file="Gscores_high_moderate_dvh.txt", sep="\t")
 ```
-

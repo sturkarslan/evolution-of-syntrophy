@@ -1,5 +1,10 @@
-### Function to collect 1000-gen mutation data
-### Function to load mutation Data and modify gene names ###
+############# Serdar Turkarslan / Institute for Systems Biology ###############
+# Last update: 06/05/2020
+###############################################################################
+# Function to load all the mutation Data,  modify gene names and other 
+# modifications to prepare for plotting
+###############################################################################
+
 load.mutation.data <- function(org="dvh", sample_type=c("1000-gen", "all", "Early-gen"), remove_missing_EG=FALSE){
   # load early generation mutations data
   if(org == "dvh"){

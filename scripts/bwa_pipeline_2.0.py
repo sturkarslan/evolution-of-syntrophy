@@ -1,4 +1,9 @@
-## Variant calling v2.0
+############# Serdar Turkarslan / Institute for Systems Biology ###############
+# Last update: 06/05/2020
+###############################################################################
+# DNASeq variant calling pipeline for read quality control (trim_galore), 
+# read alignments to reference (bwa) and variant calling by GATK, Samtools and Varscan.
+###############################################################################
 import glob
 import sys
 import os
